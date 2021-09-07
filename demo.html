@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Engage Web Push</title>
+
+        <style type="text/css">
+            .clear:after {
+                clear: both;
+                content: "          ";
+                display: table;
+            }
+        </style>
+    </head>
+    <body>
+		<h1>Mapp Engage Web Push without Mapp Intelligence</h1>
+		<p>See <a href="https://documentation.mapp.com/latest/en/web-push-19129466.html" target="_blank">documentation</a> for more information.</p>
+		<hr>
+
+        <div class="clear">
+            <div id="setting" style="float: left; width: 30%;">
+                <label style="margin-bottom: 5px;display: block;">
+                    <span style="width: 150px;display: inline-block;">Service Domain:</span>
+                    <input id="serviceDomain" size="30" type="text" value="charon-test.shortest-route.com">
+                </label>
+                <label style="margin-bottom: 5px;display: block;">
+                    <span style="width: 150px;display: inline-block;">XKey:</span>
+                    <input id="xkey" size="30" type="text" placeholder="17b546a78a4611.68964998" value="17b546a78a4611.68964998">
+                </label>
+
+                <button onclick="start();">START</button>
+                <button onclick="window.localStorage.clear(); location.reload();">CLEAN USER</button>
+                <button onclick="location.reload();">PAGE RELOAD</button>
+            </div>
+
+            <div style="float: left; width: 30%;">
+                <label style="margin-bottom: 5px;display: block;">
+                    <span style="width: 150px;display: inline-block;">Alias:</span>
+                    <input id="alias" size="30" type="text" placeholder="foo@bar.com" value="">
+                </label>
+
+                <button onclick="sendAlias();">SEND ALIAS</button>
+            </div>
+        </div>
+        <hr>
+
+        <div>
+            <button onclick="document.getElementById('result').innerHTML = '';">CLEAR RESULTS</button>
+        </div>
+
+        <div id="result"></div>
+
+        <script type="text/javascript">
+			document.cookie = 'mapp_debug=1';
+
+            var elm = document.getElementById('result');
+
+            var consoleLog = console.log;
+            console.log = function(msg) {
+                elm.innerHTML += '<div><p>' + msg + '</p></div>';
+
+                consoleLog(msg);
+            };
+
+            var sendAlias = function() {
+                window.mappWebpushMessage = window.mappWebpushMessage || [];
+                window.mappWebpushMessage.push({
+					action: 'alias',
+					value: document.getElementById('alias').value
+				});
+            };
+
+            var start = function() {
+				window.wt_webpushConfig = {
+					serviceDomain: document.getElementById('serviceDomain').value,
+					webpushScriptIncluded: false,
+					useUserMatching: true,
+					xKey: document.getElementById('xkey').value,
+					serviceWorkerScript: './firebase-messaging-sw.js',
+					includeFirebaseScripts: true,
+					firebaseConfig: {
+                        apiKey: '<<Firebase apiKey>>',
+                        authDomain: '<<Firebase authDomain>>',
+                        projectId: '<<Firebase projectId>>',
+                        storageBucket: '<<Firebase storageBucket>>',
+                        messagingSenderId: '<<Firebase messagingSenderId>>',
+                        appId: '<<Firebase appId>>',
+                        measurementId: '<<Firebase measurementId>>'
+					}
+				};
+
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = './webpush.min.js';
+                document.head.appendChild(script);
+            };
+        </script>
+    </body>
+</html>
